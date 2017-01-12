@@ -59,7 +59,7 @@ Station options are set in the script.
 * tleDir - Directory where to look for TLE files, default /tmp (as in update-keps.sh)
 * tleFile - TLE filename (as in update-keps.sh)
 * minElev - Minimal elevation for prediction and record
-* removeRaws - should we remove RAW wave files (before transcode)
+* removeRaws - should we remove RAW wave files (after transcoding to 11kHz)
 
 ####Directories: directories used for misc. files
 
@@ -72,7 +72,7 @@ Station options are set in the script.
 * wxAddOverlay - Should the script generate images with map overlay?
 * wxEnhCreate - Create NOAA enhancements? Without this setting only raw wxtoimg decode would be created
 * wxEnhList - List of NOAA enhancements script should create, look at wxtoimg documentation which enhancements are supported
-* wxQuietOutput - Script won't create any output
+* wxQuietOutput - Silent output, everything's logged
 * wxDecodeAll - the same as -A option in wxtoimg - decode everything, including noise
 * wxJPEGQuality - quality of JPEG files
 * wxAddTextOverlay - if the script should add custom overlay text
