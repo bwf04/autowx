@@ -27,10 +27,15 @@ Prerequisites:
 
 nsat/pypredict package:
 
+
 git clone https://github.com/nsat/pypredict.git
+
 cd pypredict
+
 sudo apt-get install python-dev
+
 sudo python setup.py install
+
 
 As for wxtoimg I strongly recomment grabbing .tar.gz package and unpacking it to your /usr/local/ dir. Packages are provided on wxtoimg website.
 
