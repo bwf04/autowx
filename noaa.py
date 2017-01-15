@@ -187,16 +187,18 @@ def runForDuration(cmdline, duration):
 def recordFM(freq, fname, duration, xfname):
     print bcolors.GRAY
     xfNoSpace=xfname.replace(" ","")
-    cmdline = ['rtl_fm',\
+    cmdline = ['/usr/bin/rtl_fm',\
 		'-f',str(freq),\
 		'-s',sample,\
 		'-g',dongleGain,\
 		'-F','9',\
+		'-l','0',\
+		'-t','900',\
 		'-A','fast',\
-		'-E','dc',\
 		'-E','offset',\
+#		'-E','pad',\
 		'-p',dongleShift,\
-		recdir+'/'+xfNoSpace+'-'+fname+'.raw' ]
+		recdir+'/'+xfNoSpace+'-'+fname+'.raw']
     runForDuration(cmdline, duration)
 ##
 ## Status builder. Crazy shit.
@@ -221,8 +223,11 @@ def writeStatus(freq, aosTime, losTime, losTimeUnix, recordTime, xfName, maxElev
 def transcode(fname):
     xfNoSpace=xfname.replace(" ","")
     print logLineStart+'Transcoding...'+bcolors.YELLOW
-    cmdline = ['sox','-t','raw','-r',sample,'-es','-b','16','-c','1','-V1',recdir+'/'+xfNoSpace+'-'+fname+'.raw',recdir+'/'+xfNoSpace+'-'+fname+'.wav','rate',wavrate]
-    subprocess.call(cmdline)
+    cmdlinesox = ['sox','-t','raw','-r',sample,'-es','-b','16','-c','1','-V1',recdir+'/'+xfNoSpace+'-'+fname+'.raw',recdir+'/'+xfNoSpace+'-'+fname+'.wav','rate',wavrate]
+#    cmdline = ['sox',recdir+'/'+xfNoSpace+'-'+fname+'.raw',recdir+'/'+xfNoSpace+'-'+fname+'.wav','rate',wavrate]
+    subprocess.call(cmdlinesox)
+    cmdlinetouch = ['touch','-r'+recdir+'/'+xfNoSpace+'-'+fname+'.raw',recdir+'/'+xfNoSpace+'-'+fname+'.wav']
+    subprocess.call(cmdlinetouch)
     if removeRAW in ('yes', 'y', '1'):
 	print logLineStart+bcolors.ENDC+bcolors.RED+'Removing RAW data'+logLineEnd
 	os.remove(recdir+'/'+xfNoSpace+'-'+fname+'.raw')
@@ -237,7 +242,7 @@ def createoverlay(fname,aosTime,satName,recLen):
     '-T',satName,\
     '-G',str(tleDir),\
     '-H',str(tleFile),\
-    '-M',str(int(minElev)-2),\
+    '-M','0',\
     '-o', \
     '-A','0', \
     '-O',str(recLenC), \
@@ -391,12 +396,11 @@ while True:
     print logLineStart+"Beginning pass of "+bcolors.YELLOW+satName+bcolors.OKGREEN+" at "+bcolors.CYAN+str(maxElev)+"°"+bcolors.OKGREEN+" elev.\n"+logLineStart+"Predicted start "+bcolors.CYAN+aosTimeCnv+bcolors.OKGREEN+" and end "+bcolors.CYAN+losTimeCnv+bcolors.OKGREEN+".\n"+logLineStart+"Will record for "+bcolors.CYAN+str(recordTime).split(".")[0]+bcolors.OKGREEN+" seconds."+logLineEnd
     writeStatus(freq,aosTimeCnv,losTimeCnv,str(losTime),str(recordTime).split(".")[0],satName,maxElev,'RECORDING')
     recordWAV(freq,fname,recordTime,xfname)
-#    recordWAV(freq,fname,int(2),xfname)
     print logLineStart+"Decoding data"+logLineEnd
     if xfname in ('NOAA 15', 'NOAA 19', 'NOAA 18'):
         writeStatus(freq,aosTimeCnv,losTimeCnv,str(losTime),str(recordTime).split(".")[0],satName,maxElev,'DECODING')
         decode(fname,aosTime,satName,maxElev,recordTime) # make picture
     print logLineStart+"Finished pass of "+bcolors.YELLOW+satName+bcolors.OKGREEN+" at "+bcolors.CYAN+losTimeCnv+bcolors.OKGREEN+". Sleeping for"+bcolors.CYAN+" 2"+bcolors.OKGREEN+" seconds"+logLineEnd
     subprocess.call('sudo /usr/local/bin/czujniki.sh start', shell=True)
-    time.sleep(2.0)
+    time.sleep(10.0)
 
