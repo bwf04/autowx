@@ -416,16 +416,13 @@ while True:
 ##
     fname=str(aosTime)
     xfname=satName
-    subprocess.call('sudo /usr/local/bin/czujniki.sh stop', shell=True)
     print logLineStart+"Beginning pass of "+bcolors.YELLOW+satName+bcolors.OKGREEN+" at "+bcolors.CYAN+str(maxElev)+"°"+bcolors.OKGREEN+" elev.\n"+logLineStart+"Predicted start "+bcolors.CYAN+aosTimeCnv+bcolors.OKGREEN+" and end "+bcolors.CYAN+losTimeCnv+bcolors.OKGREEN+".\n"+logLineStart+"Will record for "+bcolors.CYAN+str(recordTime).split(".")[0]+bcolors.OKGREEN+" seconds."+logLineEnd
     writeStatus(freq,aosTimeCnv,losTimeCnv,str(losTime),str(recordTime).split(".")[0],satName,maxElev,'RECORDING')
     recordWAV(freq,fname,recordTime,xfname)
-##    recordWAV(freq,fname,int(2),xfname)
     print logLineStart+"Decoding data"+logLineEnd
     if xfname in ('NOAA 15', 'NOAA 19', 'NOAA 18'):
         writeStatus(freq,aosTimeCnv,losTimeCnv,str(losTime),str(recordTime).split(".")[0],satName,maxElev,'DECODING')
         decode(fname,aosTime,satName,maxElev,recordTime) # make picture
     print logLineStart+"Finished pass of "+bcolors.YELLOW+satName+bcolors.OKGREEN+" at "+bcolors.CYAN+losTimeCnv+bcolors.OKGREEN+". Sleeping for"+bcolors.CYAN+" 2"+bcolors.OKGREEN+" seconds"+logLineEnd
-    subprocess.call('sudo /usr/local/bin/czujniki.sh start', shell=True)
     time.sleep(10.0)
 
