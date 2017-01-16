@@ -243,6 +243,8 @@ def createoverlay(fname,aosTime,satName,recLen):
     '-G',str(tleDir),\
     '-H',str(tleFile),\
     '-M','0',\
+    '-f','0',\
+    '-F','0',\
     '-o', \
     '-A','0', \
     '-O',str(recLenC), \
@@ -273,6 +275,16 @@ def decode(fname,aosTime,satName,maxElev,recLen):
 	    res=line.replace("\n", "")
 	    res2=re.sub(r"(\d)", r"\033[96m\1\033[94m", res)
 	    print logLineStart+bcolors.OKBLUE+res2+logLineEnd
+#Copy logs
+	if LOG_SCP in ('yes', 'y', '1'):
+	    print logLineStart+"Sending flight and decode logs..."+bcolors.YELLOW
+	    cmdline_scp_log = [ '/usr/bin/scp',imgdir+'/'+satName+'/'+fileNameC+'-normal-map.jpg.txt',SCP_USER+'@'+SCP_HOST+':'+SCP_DIR+'/'+satName.replace(" ","\ ")+'-'+fileNameC+'-normal-map.jpg.txt' ] 
+	    subprocess.call(cmdline_scp_log)
+	if IMG_SCP in ('yes', 'y', '1'):
+	    print logLineStart+"Sending base image with map: "+bcolors.YELLOW
+	    cmdline_scp_img = [ '/usr/bin/scp',imgdir+'/'+satName+'/'+fileNameC+'-normal-map.jpg',SCP_USER+'@'+SCP_HOST+':'+SCP_DIR+'/'+satName.replace(" ","\ ")+'-'+fileNameC+'-normal-map.jpg' ] 
+	    subprocess.call(cmdline_scp_img)
+	    print logLineStart+"Sending OK, go on..."+logLineEnd
 ## NOWE
 	if wxEnhCreate in ('yes', 'y', '1'):
 	    for enhancements in wxEnhList:
@@ -281,11 +293,12 @@ def decode(fname,aosTime,satName,maxElev,recLen):
 		enhancements_log.write('\nEnhancement: '+enhancements+', SAT: '+str(xfNoSpace)+', Elevation max: '+str(maxElev)+', Date: '+str(fname)+'\n')
 		cmdline_enhancements = [ wxInstallDir+'/wxtoimg',wxQuietOpt,wxDecodeOpt,wxAddText,'-K','-o','-R1','-Q '+wxJPEGQuality,'-e',enhancements,'-m',mapDir+'/'+fname+'-map.png'+','+str(wxOverlayOffsetX)+','+str(wxOverlayOffsetY),recdir+'/'+xfNoSpace+'-'+fname+'.wav',imgdir+'/'+satName+'/'+fileNameC+'-'+enhancements+'-map.jpg']
 		subprocess.call(cmdline_enhancements, stderr=enhancements_log, stdout=enhancements_log)
+		for psikus in open(mapDir+'/'+str(fname)+'-map.png.txt',"r").readlines():
+		    res=psikus.replace("\n", " \n")
+		    enhancements_log.write(res)
+		enhancements_log.close()
 		if LOG_SCP in ('yes', 'y', '1'):
 		    print logLineStart+"Sending "+enhancements+" flight and decode logs..."+bcolors.YELLOW
-		    for psikus in open(mapDir+'/'+str(fname)+'-map.png.txt',"r").readlines():
-			res=psikus.replace("\n", " \n")
-			enhancements_log.write(res)
 		    cmdline_scp_log = [ '/usr/bin/scp',imgdir+'/'+satName+'/'+fileNameC+'-'+enhancements+'-map.jpg.txt',SCP_USER+'@'+SCP_HOST+':'+SCP_DIR+'/'+satName.replace(" ","\ ")+'-'+fileNameC+'-'+enhancements+'-map.jpg.txt' ] 
 		    subprocess.call(cmdline_scp_log)
 		    print logLineStart+"Sending logs OK, moving on..."+logLineEnd
@@ -294,6 +307,7 @@ def decode(fname,aosTime,satName,maxElev,recLen):
 		    cmdline_scp_img = [ '/usr/bin/scp',imgdir+'/'+satName+'/'+fileNameC+'-'+enhancements+'-map.jpg',SCP_USER+'@'+SCP_HOST+':'+SCP_DIR+'/'+satName.replace(" ","\ ")+'-'+fileNameC+'-'+enhancements+'-map.jpg' ] 
 		    subprocess.call(cmdline_scp_img)
 		    print logLineStart+"Send image OK, moving on..."+logLineEnd
+
 # SFPG
 	if sfpgLink in ('yes', 'y', '1'):
 	    sciezka_plik=imgdir+'/'+satName+'/'+fileNameC+'-MCIR-map.jpg'
@@ -312,6 +326,15 @@ def decode(fname,aosTime,satName,maxElev,recLen):
 	    res=line.replace("\n", "")
 	    res2=re.sub(r"(\d)", r"\033[96m\1\033[94m", res)
 	    print logLineStart+bcolors.OKBLUE+res2+logLineEnd
+	if LOG_SCP in ('yes', 'y', '1'):
+	    print logLineStart+"Sending flight and decode logs..."+bcolors.YELLOW
+	    cmdline_scp_log = [ '/usr/bin/scp',imgdir+'/'+satName+'/'+fileNameC+'-normal-map.jpg.txt',SCP_USER+'@'+SCP_HOST+':'+SCP_DIR+'/'+satName.replace(" ","\ ")+'-'+fileNameC+'-normal-map.jpg.txt' ] 
+	    subprocess.call(cmdline_scp_log)
+	if IMG_SCP in ('yes', 'y', '1'):
+	    print logLineStart+"Sending base image with map: "+bcolors.YELLOW
+	    cmdline_scp_img = [ '/usr/bin/scp',imgdir+'/'+satName+'/'+fileNameC+'-normal-map.jpg',SCP_USER+'@'+SCP_HOST+':'+SCP_DIR+'/'+satName.replace(" ","\ ")+'-'+fileNameC+'-normal-map.jpg' ] 
+	    subprocess.call(cmdline_scp_img)
+	    print logLineStart+"Sending OK, go on..."+logLineEnd
 	if wxEnhCreate in ('yes', 'y', '1'):
 	    for enhancements in wxEnhList:
 		print logLineStart+'Creating '+enhancements+' image'+logLineEnd
@@ -319,6 +342,7 @@ def decode(fname,aosTime,satName,maxElev,recLen):
 		enhancements_log.write('\nEnhancement: '+enhancements+', SAT: '+str(xfNoSpace)+', Elevation max: '+str(maxElev)+', Date: '+str(fname)+'\n')
 		cmdline_enhancements = [ wxInstallDir+'/wxtoimg',wxQuietOpt,wxDecodeOpt,wxAddText,'-o','-K','-R1','-Q '+wxJPEGQuality,'-e',enhancements,recdir+'/'+xfNoSpace+'-'+fname+'.wav',imgdir+'/'+satName+'/'+fileNameC+'-'+enhancements+'-nomap.jpg']
 		subprocess.call(cmdline_enhancements, stderr=enhancements_log, stdout=enhancements_log)
+		enhancements_log.close()
 		if LOG_SCP in ('yes', 'y', '1'):
 		    print logLineStart+"Sending "+enhancements+" flight and decode logs..."+bcolors.YELLOW
 		    cmdline_scp_log = [ '/usr/bin/scp',imgdir+'/'+satName+'/'+fileNameC+'-'+enhancements+'-map.jpg.txt',SCP_USER+'@'+SCP_HOST+':'+SCP_DIR+'/'+satName.replace(" ","\ ")+'-'+fileNameC+'-'+enhancements+'-map.jpg.txt' ] 
@@ -396,6 +420,7 @@ while True:
     print logLineStart+"Beginning pass of "+bcolors.YELLOW+satName+bcolors.OKGREEN+" at "+bcolors.CYAN+str(maxElev)+"°"+bcolors.OKGREEN+" elev.\n"+logLineStart+"Predicted start "+bcolors.CYAN+aosTimeCnv+bcolors.OKGREEN+" and end "+bcolors.CYAN+losTimeCnv+bcolors.OKGREEN+".\n"+logLineStart+"Will record for "+bcolors.CYAN+str(recordTime).split(".")[0]+bcolors.OKGREEN+" seconds."+logLineEnd
     writeStatus(freq,aosTimeCnv,losTimeCnv,str(losTime),str(recordTime).split(".")[0],satName,maxElev,'RECORDING')
     recordWAV(freq,fname,recordTime,xfname)
+##    recordWAV(freq,fname,int(2),xfname)
     print logLineStart+"Decoding data"+logLineEnd
     if xfname in ('NOAA 15', 'NOAA 19', 'NOAA 18'):
         writeStatus(freq,aosTimeCnv,losTimeCnv,str(losTime),str(recordTime).split(".")[0],satName,maxElev,'DECODING')
